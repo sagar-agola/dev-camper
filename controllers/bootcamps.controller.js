@@ -74,7 +74,17 @@ exports.getAll = asyncHandler(async (req, res, next) => {
 });
 
 exports.get = asyncHandler(async (req, res, next) => {
-    const bootcamp = await Bootcamp.findById(req.params.id);
+    let query;
+
+    // select fields
+    if (req.query.select) {
+        const fields = req.query.select.split(',').join(' ');
+        query = Bootcamp.findById(req.params.id).select(fields);
+    } else {
+        query = Bootcamp.findById(req.params.id);
+    }
+
+    const bootcamp = await query;
 
     if (!bootcamp) {
         return next(new ErrorResponse(`Resourse not foud with Id: ${req.params.id}`, 404));
