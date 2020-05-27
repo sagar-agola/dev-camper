@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAll, get, create, update, remove } = require('../controllers/bootcamps.controller');
+const { getAll, get, create, update, remove, getByDistance } = require('../controllers/bootcamps.controller');
 
 const router = express.Router();
 
@@ -11,5 +11,7 @@ router.route('/:id')
     .get(get)
     .put(update)
     .delete(remove);
+
+router.route('/radius/:zipcode/:distance').get(getByDistance);
 
 module.exports = router;

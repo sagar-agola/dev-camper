@@ -122,7 +122,8 @@ BootcampSchema.pre('save', async function (req, res, next) {
     // remove user entered address
     this.address = undefined;
 
-    next();
+    // if this comment removed then seeder import method won't go
+    // next();
 });
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema);

@@ -10,7 +10,12 @@ const Bootcamp = require('./models/Bootcamp');
 const connectDb = require('./config/db');
 
 // connect to mongodb
-connectDb();
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
+});
 
 // read json data file
 const bootcamps = JSON.parse(
@@ -20,7 +25,8 @@ const bootcamps = JSON.parse(
 // import data
 const importData = async () => {
     try {
-        await Bootcamp.insertMany(bootcamps);
+        await Bootcamp.create(bootcamps);
+
         console.log('Data Imported...'.green.inverse);
         process.exit();
     } catch (error) {
