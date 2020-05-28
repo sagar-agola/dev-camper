@@ -4,73 +4,7 @@ const asyncHandler = require('../middlewares/asyncFunctionHandler');
 const geoCoder = require('../utils/geocoder');
 
 exports.getAll = asyncHandler(async (req, res, next) => {
-    let query;
-
-    const reqQuery = { ...req.query };
-
-    // fields to exclude
-    const removeFields = ['select', 'sort', 'page', 'limit'];
-
-    // loop over removed fields and remove from reqQuery
-    removeFields.forEach(param => delete reqQuery[param]);
-
-    // create query string and create operators (gt => $gt)
-    let queryString = JSON.stringify(reqQuery);
-    queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-
-    // find resource
-    query = Bootcamp.find(JSON.parse(queryString));
-
-    // select fields
-    if (req.query.select) {
-        const fields = req.query.select.split(',').join(' ');
-        query = query.select(fields);
-    }
-
-    // sort
-    if (req.query.sort) {
-        const sortBy = req.query.sort.split(',').join(' ');
-        query = query.sort(sortBy);
-    } else {
-        query = query.sort('-createdAt');
-    }
-
-    // pagination
-    let pageNumber = parseInt(req.query.page, 10) || 1;
-    const page = pageNumber > 0 ? pageNumber : 1;
-    const limit = parseInt(req.query.limit, 10) || 2;
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    const total = await Bootcamp.countDocuments();
-
-    query = query.skip(startIndex).limit(limit);
-
-    // executing query
-    const bootcamps = await query;
-
-    // paginaion result 
-    const pagination = {};
-
-    if (endIndex < total) {
-        pagination.next = {
-            page: page + 1,
-            limit: limit
-        };
-    }
-
-    if (startIndex > 0 && startIndex < total) {
-        pagination.prev = {
-            page: page - 1,
-            limit: limit
-        };
-    }
-
-    res.status(200).json({
-        success: true,
-        count: bootcamps.length,
-        pagination: pagination,
-        data: bootcamps
-    });
+    res.status(200).json(res.advancedResults);
 });
 
 exports.get = asyncHandler(async (req, res, next) => {
