@@ -7,47 +7,53 @@ const env = require('dotenv');
 env.config({ path: './config/config.env' });
 
 const Bootcamp = require('./models/Bootcamp');
-const connectDb = require('./config/db');
+const Course = require('./models/Course');
 
 // connect to mongodb
 mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true,
 });
 
 // read json data file
 const bootcamps = JSON.parse(
-    fs.readFileSync(`${__dirname}/_data/bootcamps.json`, 'utf-8')
+  fs.readFileSync(`${__dirname}/_data/bootcamps.json`, 'utf-8')
+);
+const courses = JSON.parse(
+  fs.readFileSync(`${__dirname}/_data/courses.json`, 'utf-8')
 );
 
 // import data
 const importData = async () => {
-    try {
-        await Bootcamp.create(bootcamps);
+  try {
+    await Bootcamp.create(bootcamps);
+    await Course.create(courses);
 
-        console.log('Data Imported...'.green.inverse);
-        process.exit();
-    } catch (error) {
-        console.log(`${error}.bgWhite.red`);
-    }
-}
+    console.log('Data Imported...'.green.inverse);
+    process.exit();
+  } catch (error) {
+    console.log(`${error}.bgWhite.red`);
+  }
+};
 
 // delete data
 const deleteData = async () => {
-    try {
-        await Bootcamp.deleteMany();
-        console.log('Data deleted...'.bgWhite.red);
-        process.exit();
-    } catch (error) {
-        console.log(`${error}.bgWhite.red`);
-    }
-}
+  try {
+    await Bootcamp.deleteMany();
+    await Course.deleteMany();
+
+    console.log('Data deleted...'.bgWhite.red);
+    process.exit();
+  } catch (error) {
+    console.log(`${error}.bgWhite.red`);
+  }
+};
 
 // read arguments
 if (process.argv[2] === '-i') {
-    importData();
+  importData();
 } else if (process.argv[2] === '-d') {
-    deleteData();
+  deleteData();
 }
