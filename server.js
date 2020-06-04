@@ -11,6 +11,7 @@ env.config({ path: './config/config.env' });
 const connectDb = require('./config/db');
 const bootcampRoutes = require('./routes/bootcamps.routes');
 const courseRoutes = require('./routes/courses.routes');
+const authRoutes = require('./routes/auth.routes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -35,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/api/bootcamps', bootcampRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/auth', authRoutes);
 
 // mongo error handler
 app.use(errorHandler);
