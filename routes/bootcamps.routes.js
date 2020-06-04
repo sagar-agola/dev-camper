@@ -6,6 +6,7 @@ const {
   update,
   remove,
   getByDistance,
+  uploadPhoto,
 } = require('../controllers/bootcamps.controller');
 const advancedResults = require('../middlewares/advancedResults');
 
@@ -25,5 +26,6 @@ router
   .post(create);
 router.route('/:id').get(get).put(update).delete(remove);
 router.route('/radius/:zipcode/:distance').get(getByDistance);
+router.route('/:id/photo').put(uploadPhoto);
 
 module.exports = router;

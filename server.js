@@ -1,7 +1,9 @@
 const express = require('express');
+const path = require('path');
 const env = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
+const fileUpload = require('express-fileupload');
 
 // Load configuration variables
 env.config({ path: './config/config.env' });
@@ -23,6 +25,12 @@ if (process.env.NODE_ENV == 'development') {
 
 // body parser
 app.use(express.json());
+
+// express file uploader
+app.use(fileUpload());
+
+// set public folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api/bootcamps', bootcampRoutes);
