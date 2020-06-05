@@ -40,6 +40,9 @@ exports.login = asyncHandler(async (req, res, next) => {
 });
 
 // api/auth/me
+exports.getMe = asyncHandler((req, res, next) => {
+  res.status(200).json({ success: true, data: req.user });
+});
 
 // private methods
 const sendTokenResponse = (user, statusCode, res) => {

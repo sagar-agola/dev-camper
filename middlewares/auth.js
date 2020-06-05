@@ -14,7 +14,7 @@ module.exports = (...allowedRoles) =>
     ) {
       // set token from header
       token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies.token) {
+    } else if (process.env.NODE_ENV == 'production' && req.cookies.token) {
       // set token from cookie
       token = req.cookies.token;
     }
