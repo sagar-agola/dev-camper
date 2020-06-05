@@ -4,6 +4,7 @@ const env = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
 const fileUpload = require('express-fileupload');
+const cookieParse = require('cookie-parser');
 
 // Load configuration variables
 env.config({ path: './config/config.env' });
@@ -26,6 +27,9 @@ if (process.env.NODE_ENV == 'development') {
 
 // body parser
 app.use(express.json());
+
+// cookie parser
+app.use(cookieParse());
 
 // express file uploader
 app.use(fileUpload());
