@@ -8,6 +8,7 @@ const {
   update,
   remove,
 } = require('../controllers/courses.controller');
+const authorize = require('../middlewares/auth');
 
 const router = express.Router({ mergeParams: true });
 
@@ -19,7 +20,11 @@ router
     avdancedResults(Course, { path: 'bootcamp', select: 'name description' }),
     getAll
   )
-  .post(add);
-router.route('/:id').get(get).put(update).delete(remove);
+  .post(authorize('publisher', 'admin'), add);
+router
+  .route('/:id')
+  .get(get)
+  .put(authorize('publisher', 'admin'), update)
+  .delete(authorize('publisher', 'admin'), remove);
 
 module.exports = router;
