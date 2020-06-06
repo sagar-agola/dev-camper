@@ -60,7 +60,15 @@ exports.get = asyncHandler(async (req, res, next) => {
 
 // POST: api/bootcamps/:bootcampId/courses
 exports.add = asyncHandler(async (req, res, next) => {
-  console.log(req.params);
+  if (!req.params.bootcampId) {
+    return next(
+      new ErrorResponse(
+        'Invalid url. Please use /api/bootcamps/:bootcampId/courses to create course',
+        400
+      )
+    );
+  }
+
   // check if bootcamp exists
   const bootcamp = await Bootcamp.findById(req.params.bootcampId);
 
