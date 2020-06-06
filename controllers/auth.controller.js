@@ -2,7 +2,7 @@ const User = require('../models/User');
 const asyncHandler = require('../middlewares/asyncFunctionHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-// api/auth/register
+// POST: api/auth/register
 exports.register = asyncHandler(async (req, res, next) => {
   const { name, email, password, role } = req.body;
 
@@ -11,7 +11,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 201, res);
 });
 
-// api/auth/login
+// POST: api/auth/login
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -39,9 +39,53 @@ exports.login = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-// api/auth/me
-exports.getMe = asyncHandler((req, res, next) => {
+// GET: api/auth/me
+exports.getMe = (req, res, next) => {
   res.status(200).json({ success: true, data: req.user });
+};
+
+// PUT api/auth/update-profile
+exports.updateProfile = asyncHandler(async (req, res, next) => {
+  const fieldsToUpdate = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+
+  const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({ success: true, data: user });
+});
+
+// POST api/auth/update-password
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  // validate request
+  if (!req.body.currentPassword || !req.body.newPassword) {
+    return next(
+      new ErrorResponse(
+        'Current Password and New Password are required field.',
+        400
+      )
+    );
+  }
+
+  // get user
+  const user = await User.findById(req.user.id).select('+password');
+
+  // compare password
+  const isValidPassword = await user.matchPassword(req.body.currentPassword);
+
+  if (!isValidPassword) {
+    return next(new ErrorResponse('Invalid current password.', 401));
+  }
+
+  // updae password
+  user.password = req.body.newPassword;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
 });
 
 // private methods

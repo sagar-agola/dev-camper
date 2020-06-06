@@ -3,8 +3,8 @@ const asyncHandler = require('../middlewares/asyncFunctionHandler');
 const Course = require('../models/Course');
 const Bootcamp = require('../models/Bootcamp');
 
-// api/courses
-// api/bootcamps/:bootcampId/courses
+// GET: api/courses
+// GET: api/bootcamps/:bootcampId/courses
 exports.getAll = asyncHandler(async (req, res, next) => {
   let response;
 
@@ -42,7 +42,7 @@ exports.getAll = asyncHandler(async (req, res, next) => {
   res.status(200).json(response);
 });
 
-// api/courses/:id
+// GET: api/courses/:id
 exports.get = asyncHandler(async (req, res, next) => {
   const course = await Course.findById(req.params.id).populate({
     path: 'bootcamp',
@@ -58,7 +58,7 @@ exports.get = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: course });
 });
 
-// api/bootcamps/:bootcampId/courses
+// POST: api/bootcamps/:bootcampId/courses
 exports.add = asyncHandler(async (req, res, next) => {
   console.log(req.params);
   // check if bootcamp exists
@@ -82,7 +82,7 @@ exports.add = asyncHandler(async (req, res, next) => {
   res.status(201).json({ success: true, data: course });
 });
 
-// api/courses/:id
+// PUT: api/courses/:id
 exports.update = asyncHandler(async (req, res, next) => {
   let course = await Course.findById(req.params.id);
 
@@ -100,7 +100,7 @@ exports.update = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: course });
 });
 
-// api/courses/:id
+// DELETE: api/courses/:id
 exports.remove = asyncHandler(async (req, res, next) => {
   let course = await Course.findById(req.params.id);
 

@@ -6,7 +6,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middlewares/asyncFunctionHandler');
 const geoCoder = require('../utils/geocoder');
 
-// api/bootcamps
+// GET: api/bootcamps
 exports.getAll = asyncHandler(async (req, res, next) => {
   const response = {
     success: res.advancedResults.success,
@@ -18,7 +18,7 @@ exports.getAll = asyncHandler(async (req, res, next) => {
   res.status(200).json(response);
 });
 
-// api/bootcamps/:id
+// GET: api/bootcamps/:id
 exports.get = asyncHandler(async (req, res, next) => {
   let query;
 
@@ -44,7 +44,7 @@ exports.get = asyncHandler(async (req, res, next) => {
   });
 });
 
-// api/bootcamps
+// POST: api/bootcamps
 exports.create = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.create(req.body);
 
@@ -54,7 +54,7 @@ exports.create = asyncHandler(async (req, res, next) => {
   });
 });
 
-// api/bootcamps/:id
+// PUT: api/bootcamps/:id
 exports.update = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -70,7 +70,7 @@ exports.update = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: bootcamp });
 });
 
-// api/bootcamps/:id
+// DELETE: api/bootcamps/:id
 exports.remove = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
 
@@ -83,7 +83,7 @@ exports.remove = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true });
 });
 
-// api/bootcamps/radius/:zipcode/:distance
+// GET: api/bootcamps/radius/:zipcode/:distance
 exports.getByDistance = asyncHandler(async (req, res, next) => {
   const { zipcode, distance } = req.params;
 
@@ -108,7 +108,7 @@ exports.getByDistance = asyncHandler(async (req, res, next) => {
   });
 });
 
-// api/bootcamps/:id/photo
+// POST: api/bootcamps/:id/photo
 exports.uploadPhoto = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findById(req.params.id);
 
