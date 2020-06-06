@@ -9,9 +9,11 @@ exports.getAll = asyncHandler(async (req, res, next) => {
   let response;
 
   if (req.params.bootcampId) {
-    const count = await Bootcamp.countDocuments({ _id: req.params.bootcampId });
+    const isBootcampExists = await Bootcamp.exists({
+      _id: req.params.bootcampId,
+    });
 
-    if (count > 0) {
+    if (isBootcampExists) {
       response = {
         success: res.advancedResults.success,
         count: await res.advancedResults.query.countDocuments({
@@ -60,6 +62,7 @@ exports.get = asyncHandler(async (req, res, next) => {
 
 // POST: api/bootcamps/:bootcampId/courses
 exports.add = asyncHandler(async (req, res, next) => {
+  // BUG: the url 'POST api/courses' is no valid
   if (!req.params.bootcampId) {
     return next(
       new ErrorResponse(
@@ -81,6 +84,13 @@ exports.add = asyncHandler(async (req, res, next) => {
     );
   }
 
+  // make sure current user is owner of bootcamp for which he/she wants to create course
+  if (bootcamp.user != req.user.id && req.user.role != 'admin') {
+    return next(
+      new ErrorResponse('You are not authorized to access this route', 401)
+    );
+  }
+
   // append bootcampId from parameter to req.body
   req.body.bootcamp = req.params.bootcampId;
 
@@ -94,9 +104,19 @@ exports.add = asyncHandler(async (req, res, next) => {
 exports.update = asyncHandler(async (req, res, next) => {
   let course = await Course.findById(req.params.id);
 
+  // make sure course exists
   if (!course) {
     return next(
       new ErrorResponse(`Course not found with id: ${req.params.id}`, 404)
+    );
+  }
+
+  // make sure current user is owner of bootcamp for which he/she wants to create course
+  const bootcamp = await Bootcamp.findById(course.bootcamp);
+
+  if (bootcamp.user != req.user.id && req.user.role != 'admin') {
+    return next(
+      new ErrorResponse('You are not authorized to access this route', 401)
     );
   }
 
@@ -115,6 +135,15 @@ exports.remove = asyncHandler(async (req, res, next) => {
   if (!course) {
     return next(
       new ErrorResponse(`Course not found with id: ${req.params.id}`, 404)
+    );
+  }
+
+  // make sure current user is owner of bootcamp for which he/she wants to create course
+  const bootcamp = await Bootcamp.findById(course.bootcamp);
+
+  if (bootcamp.user != req.user.id && req.user.role != 'admin') {
+    return next(
+      new ErrorResponse('You are not authorized to access this route', 401)
     );
   }
 

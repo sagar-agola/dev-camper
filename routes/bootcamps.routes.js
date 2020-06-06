@@ -23,7 +23,13 @@ router.use('/:bootcampId/courses', courseRouter);
 
 router
   .route('/')
-  .get(advancedResults(Bootcamp, 'courses'), getAll)
+  .get(
+    advancedResults(Bootcamp, {
+      path: 'courses user',
+      select: 'title name email',
+    }),
+    getAll
+  )
   .post(authorize('publisher', 'admin'), create);
 router
   .route('/:id')

@@ -35,7 +35,6 @@ const CourseSchema = new mongoose.Schema({
     default: Date.now,
   },
   bootcamp: {
-    // not required as we are passing it through url
     type: mongoose.Schema.ObjectId,
     ref: 'Bootcamp',
     required: true,

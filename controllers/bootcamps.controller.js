@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const Bootcamp = require('../models/Bootcamp');
+const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middlewares/asyncFunctionHandler');
 const geoCoder = require('../utils/geocoder');
@@ -30,11 +31,11 @@ exports.get = asyncHandler(async (req, res, next) => {
     query = Bootcamp.findById(req.params.id);
   }
 
-  const bootcamp = await query;
+  const bootcamp = await query.populate('courses user');
 
   if (!bootcamp) {
     return next(
-      new ErrorResponse(`Resourse not foud with Id: ${req.params.id}`, 404)
+      new ErrorResponse(`Bootcamp not foud with Id: ${req.params.id}`, 404)
     );
   }
 
@@ -46,7 +47,42 @@ exports.get = asyncHandler(async (req, res, next) => {
 
 // POST: api/bootcamps
 exports.create = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.create(req.body);
+  // admin can create as many botcamp as he/she want
+  if (req.user.role == 'admin') {
+    // admin can create only one bootcamp per
+    const isBootcampExists = await Bootcamp.exists({ user: req.body.user });
+
+    if (isBootcampExists) {
+      return next(
+        new ErrorResponse('You can create only one Bootcamp per user', 400)
+      );
+    }
+
+    // make sure user id publisher
+    const user = await User.findById(req.body.user);
+
+    if (user.role != 'publisher') {
+      return next(
+        new ErrorResponse('User must be publisher to own a Bootcamp', 400)
+      );
+    }
+  } else {
+    // find bootcamp owned by current user
+    const isBootcampExists = await Bootcamp.exists({ user: req.user.id });
+
+    // make sure there is no bootcamp for logged in publisher
+    if (isBootcampExists) {
+      // current user has one bootcamp and he/she is not an admin
+      return next(
+        new ErrorResponse('You can own only one Bootcamp at a time', 400)
+      );
+    }
+
+    req.body.user = req.user.id;
+  }
+
+  // create bootcamp
+  bootcamp = await Bootcamp.create(req.body);
 
   res.status(201).json({
     syccess: require,
@@ -56,6 +92,7 @@ exports.create = asyncHandler(async (req, res, next) => {
 
 // PUT: api/bootcamps/:id
 exports.update = asyncHandler(async (req, res, next) => {
+  // find bootcamp
   const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -63,7 +100,14 @@ exports.update = asyncHandler(async (req, res, next) => {
 
   if (!bootcamp) {
     return next(
-      new ErrorResponse(`Resourse not foud with Id: ${req.params.id}`, 404)
+      new ErrorResponse(`Bootcamp not found with Id: ${req.params.id}`, 404)
+    );
+  }
+
+  // make sure current user id owner
+  if (req.user.id != bootcamp.user && req.user.role != 'admin') {
+    return next(
+      new ErrorResponse('You are unauthorized to access this route', 401)
     );
   }
 
@@ -76,7 +120,14 @@ exports.remove = asyncHandler(async (req, res, next) => {
 
   if (!bootcamp) {
     return next(
-      new ErrorResponse(`Resourse not foud with Id: ${req.params.id}`, 404)
+      new ErrorResponse(`Bootcamp not found with Id: ${req.params.id}`, 404)
+    );
+  }
+
+  // make sure current user id owner
+  if (req.user.id != bootcamp.user && req.user.role != 'admin') {
+    return next(
+      new ErrorResponse('You are unauthorized to access this route', 401)
     );
   }
 
@@ -115,7 +166,7 @@ exports.uploadPhoto = asyncHandler(async (req, res, next) => {
   // make sure bootcamp exists
   if (!bootcamp) {
     return next(
-      new ErrorResponse(`Resourse not foud with Id: ${req.params.id}`, 404)
+      new ErrorResponse(`Bootcamp not found with Id: ${req.params.id}`, 404)
     );
   }
 
