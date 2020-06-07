@@ -58,7 +58,7 @@ exports.create = asyncHandler(async (req, res, next) => {
       );
     }
 
-    // make sure user id publisher
+    // make sure user is publisher
     const user = await User.findById(req.body.user);
 
     if (user.role != 'publisher') {
@@ -104,7 +104,7 @@ exports.update = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // make sure current user id owner
+  // make sure current user is owner
   if (req.user.id != bootcamp.user && req.user.role != 'admin') {
     return next(
       new ErrorResponse('You are unauthorized to access this route', 401)
@@ -124,7 +124,7 @@ exports.remove = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // make sure current user id owner
+  // make sure current user is owner
   if (req.user.id != bootcamp.user && req.user.role != 'admin') {
     return next(
       new ErrorResponse('You are unauthorized to access this route', 401)
@@ -167,6 +167,13 @@ exports.uploadPhoto = asyncHandler(async (req, res, next) => {
   if (!bootcamp) {
     return next(
       new ErrorResponse(`Bootcamp not found with Id: ${req.params.id}`, 404)
+    );
+  }
+
+  // make sure current user is owner
+  if (req.user.id != bootcamp.user && req.user.role != 'admin') {
+    return next(
+      new ErrorResponse('You are unauthorized to access this route', 401)
     );
   }
 
