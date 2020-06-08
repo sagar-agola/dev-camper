@@ -61,7 +61,7 @@ exports.get = asyncHandler(async (req, res, next) => {
 });
 
 // POST: api/bootcamps/:bootcampId/courses
-exports.add = asyncHandler(async (req, res, next) => {
+exports.create = asyncHandler(async (req, res, next) => {
   // BUG: the url 'POST api/courses' is no valid
   if (!req.params.bootcampId) {
     return next(

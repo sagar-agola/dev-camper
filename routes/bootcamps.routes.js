@@ -8,6 +8,7 @@ const {
   getByDistance,
   uploadPhoto,
 } = require('../controllers/bootcamps.controller');
+
 const advancedResults = require('../middlewares/advancedResults');
 const authorize = require('../middlewares/auth');
 
@@ -15,11 +16,13 @@ const Bootcamp = require('../models/Bootcamp');
 
 // Include other resource routers
 const courseRouter = require('./courses.routes');
+const reviewRouter = require('./reviews.routes');
 
 const router = express.Router();
 
 // re-route into other resourse router
 router.use('/:bootcampId/courses', courseRouter);
+router.use('/:bootcampId/reviews', reviewRouter);
 
 router
   .route('/')

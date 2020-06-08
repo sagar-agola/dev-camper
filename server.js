@@ -10,10 +10,12 @@ const cookieParse = require('cookie-parser');
 env.config({ path: './config/config.env' });
 
 const connectDb = require('./config/db');
+const errorHandler = require('./middlewares/errorHandler');
+
 const bootcampRoutes = require('./routes/bootcamps.routes');
 const courseRoutes = require('./routes/courses.routes');
 const authRoutes = require('./routes/auth.routes');
-const errorHandler = require('./middlewares/errorHandler');
+const reviewRouter = require('./routes/reviews.routes');
 
 const app = express();
 
@@ -41,6 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/bootcamps', bootcampRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/reviews', reviewRouter);
 
 // mongo error handler
 app.use(errorHandler);
