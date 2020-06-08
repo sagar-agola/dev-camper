@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const colors = require('colors');
 
 const ReviewSchema = mongoose.Schema({
   title: {
@@ -59,7 +60,7 @@ ReviewSchema.statics.getAverageRating = async function (bootcampId) {
       averageRating: obj[0].averageRating,
     });
   } catch (err) {
-    console.log(`${error}`.bgWhite.red);
+    console.error(error);
   }
 };
 
